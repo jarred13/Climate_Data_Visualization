@@ -1,0 +1,305 @@
+---
+title: "Data Visualization to Communicate Our Climate"
+author: "Jarred Priester"
+date: "1/21/2022"
+output:
+  pdf_document: default
+---
+1. Introduction
+2. Downloading the data
+3. Temperatures
+4. Observed Carbon
+5. Carbon Emissions
+6. Greenhouse Gases
+7. Summary
+
+# 1. Introduction
+
+Climate change is a difficult situation that we all face. Communicating our situation has also been difficult. As a data scientist I find that the best way to communicate difficult situations is through data. In this paper we will use data visualization to get a better understanding of our climate situation.
+
+We will be using data from the dslabs library in R. If you have not had a chance to explore the data sets from dslabs I recommend them, it is a fun and easy way to explore small data sets. The data we will be using is the following:
+
+***historic_co2***
+
+*Concentration of carbon dioxide in ppm by volume from direct measurements at Mauna Loa (1959-2018 CE) and indirect measurements from a series of Antarctic ice cores (approx.-800,000-2001 CE).*
+
+*Source: Mauna Loa data from NOAA. Ice core data from Bereiter et al. 2015 via NOAA.*
+
+***temp_carbon***
+
+*Annual mean global temperature anomaly on land, sea and combined, 1880-2018. Annual global carbon emissions, 1751-2014.*
+
+*Source: NOAA and Boden, T.A., G. Marland, and R.J. Andres (2017) via CDIAC*
+
+***greenhouse_gases***
+
+*Concentrations of the three main greenhouse gases carbon dioxide, methane and nitrous oxide. Measurements are from the Law Dome Ice Core in Antarctica. Selected measurements are providedevery 20 years from 1-2000 CE.*
+
+*Source: MacFarling Meure et al. 2006 via NOAA.*
+
+More on the dslabs data sets can me found [here](https://cran.r-project.org/web/packages/dslabs/dslabs.pdf)
+
+And more on NOAA, which stands for National Oceanic and Atmospheric Administration, where this data is from can be found [here](https://www.ncdc.noaa.gov/cag/global/time-series/globe/land_ocean/1/12/1880-2021?filter=true&filterType=loess)
+
+# 2. Downloading the data
+```{r,warning=FALSE,results=FALSE}
+# downloading libraries
+library(tidyverse)
+library(dslabs)
+library(ggplot2)
+library(ggthemes)
+library(scales)
+
+#downloading the data
+data("historic_co2")
+data("temp_carbon")
+data("greenhouse_gases")
+```
+
+# 3. Temperatures   
+
+Before we dive into the data visualizations let us take a quick look at the data we are working with for temperatures
+```{r}
+#looking at the data
+dim(temp_carbon)
+head(temp_carbon)
+tail(temp_carbon)
+summary(temp_carbon)
+str(temp_carbon)
+```
+
+## plot of temperatures anomaly 1880-2018
+```{r,message=FALSE}
+temp_carbon %>% filter(year >= 1880) %>%
+  ggplot(aes(year,temp_anomaly)) +
+  geom_line() +
+  geom_smooth() +
+  xlab("Year") +
+  ylab("Celsius") +
+  ggtitle("Temperture Anomaly 1880 - 2018") +
+  theme_economist()
+```
+Above we can see that annual mean temperatures have been rising over the last century. The following is a quote from NASA explaining why that matters:
+
+*So, the Earth's average temperature has increased about 2 degrees Fahrenheit during the 20th century. What's the big deal?*
+
+*Two degrees may sound like a small amount, but it's an unusual event in our planet's recent history. Earth's climate record, preserved in tree rings, ice cores, and coral reefs, shows that the global average temperature is stable over long periods of time. Furthermore, small changes in temperature correspond to enormous changes in the environment.*
+
+*For example, at the end of the last ice age, when the Northeast United States was covered by more than 3,000 feet of ice, average temperatures were only 5 to 9 degrees cooler than today.*
+
+https://climate.nasa.gov/effects/
+
+## plot of land temperatures from 1880-2018
+```{r,message=FALSE}
+temp_carbon %>% filter(year >= 1880) %>%
+  ggplot(aes(year,land_anomaly)) +
+  geom_line() +
+  geom_smooth() +
+  xlab("Year") +
+  ylab("Celsius") +
+  ggtitle("Land Temperture Anomaly 1880 - 2018") +
+  theme_economist()
+```
+
+## plot of ocean temperatures from 1880-2018
+```{r,message=FALSE}
+temp_carbon %>% filter(year >= 1880) %>%
+  ggplot(aes(year,ocean_anomaly)) +
+  geom_line() +
+  geom_smooth() +
+  xlab("Year") +
+  ylab("Celsius") +
+  ggtitle("Ocean Temperture Anomaly 1880 - 2018") +
+  theme_economist()
+```
+All three graphs show that our climate has had rising temperatures over the past century.
+
+
+# 4. Observed Carbon
+
+Now let us take a look at the data we will use for observed carbon.
+```{r}
+#looking at the data
+dim(historic_co2)
+head(historic_co2)
+tail(historic_co2)
+summary(historic_co2)
+str(historic_co2)
+```
+
+## plot of historical CO2 in the atmosphere
+```{r,message=FALSE}
+historic_co2 %>% ggplot(aes(year,co2)) +
+  geom_line() +
+  geom_smooth() +
+  scale_x_continuous(labels = label_comma()) +
+  ylab("CO2 parts per million") +
+  ggtitle("Historical CO2 in the Atmosphere") +
+  theme_economist()
+```
+As you can see the carbon in our atmosphere has a cyclical pattern that fluctuates over 100,000 year time frames. The recent results are completely out of the norm of the past 800,000 years.
+
+## plot of historical CO2 up to 1880
+```{r,message=FALSE}
+historic_co2 %>% filter(year <= 1880) %>%
+  ggplot(aes(year,co2)) +
+  geom_line() +
+  geom_smooth() +
+  scale_x_continuous(labels = label_comma()) +
+  ylab("CO2 parts per million") +
+  ggtitle("Historical CO2 from 800,000BC to 1880") +
+  theme_economist()
+```
+Before 1880, the CO2 ppm would peak around 300 and drop down to below 200.
+
+## plot of historical Co2 from 1880-2018
+```{r}
+historic_co2 %>% filter(year >= 1880) %>%
+  ggplot(aes(year,co2)) +
+  geom_line() +
+  ylab("CO2 parts per million") +
+  ggtitle("Historical CO2 from 1880 to 2018") +
+  theme_economist()
+```
+Since 1880 the observed carbon in the atmosphere has greatly deviated from the previous pattern. Blowing past the previous peak level of 300 and even going above 400.
+
+## plot of historical Co2 from 1918-2018
+```{r}
+historic_co2 %>% filter(year >= 1918) %>%
+  ggplot(aes(year,co2)) +
+  geom_line() +
+  ylab("CO2 parts per million") +
+  ggtitle("Historical CO2 from 1918 to 2018") +
+  theme_economist()
+```
+
+## plot of historical Co2 from 1980-2018
+```{r}
+historic_co2 %>% filter(year >= 1980) %>%
+  ggplot(aes(year,co2)) +
+  geom_line() +
+  ylab("CO2 parts per million") +
+  ggtitle("Historical CO2 from 1980 to 2018") +
+  theme_economist()
+```
+
+## plot of historical Co2 from 2000-2018
+```{r}
+historic_co2 %>% filter(year >= 2000) %>%
+  ggplot(aes(year,co2)) +
+  geom_line() +
+  ylab("CO2 parts per million") +
+  ggtitle("Historical CO2 from 2000 to 2018") +
+  theme_economist()
+```
+The last three graphs show that the co2 in the atmosphere is continuing to rise to record levels.
+
+# 5. Carbon Admissions
+
+## plot of carbon emissions from 1751 to 2014
+```{r,warning=FALSE}
+temp_carbon %>% ggplot(aes(year,carbon_emissions)) +
+  geom_line() +
+  ylab("millions of metric tons of carbon") +
+  ggtitle("CO2 Emissions from 1751 to 2014") +
+  theme_economist()
+```
+The CO2 emissions have gone way up as well. That may answer the question of why the observed CO2 has deviated so much from the previous pattern.
+
+## Plot of CO2 Emissions from 1751 to 1880
+```{r,warning=FALSE}
+temp_carbon %>% filter(year <= 1880) %>%
+  ggplot(aes(year,carbon_emissions)) +
+  geom_line() +
+  ylab("millions of metric tons of carbon") +
+  ggtitle("CO2 Emissions from 1751 to 1880") +
+  theme_economist()
+```
+In 1751 there was emissions of 3 millions metric tons of carbon. By 1880 it had risen to 236 million
+
+
+## Plot of CO2 Emissions from 1880 to 2014
+```{r,warning=FALSE}
+temp_carbon %>% filter(year >= 1880) %>%
+  ggplot(aes(year,carbon_emissions)) +
+  geom_line() +
+  ylab("millions of metric tons of carbon") +
+  ggtitle("CO2 Emissions from 1880 to 2014") +
+  theme_economist()
+```
+From 1880 to 2014 the CO2 emissions continued to rise.
+
+```{r,warning=FALSE}
+temp_carbon %>% filter(year >= 1914) %>%
+  ggplot(aes(year,carbon_emissions)) +
+  geom_line() +
+  ylab("millions of metric tons of carbon") +
+  ggtitle("CO2 Emissions from 1914 to 2014") +
+  theme_economist()
+```
+
+## Plot of CO2 Emissions from 1980 to 2014
+```{r,warning=FALSE}
+temp_carbon %>% filter(year >= 1980) %>%
+  ggplot(aes(year,carbon_emissions)) +
+  geom_line() +
+  ylab("millions of metric tons of carbon") +
+  ggtitle("CO2 Emissions from 1980 to 2014") +
+  theme_economist()
+```
+
+## Plot of CO2 Emissions so far this century
+```{r,warning=FALSE}
+temp_carbon %>% filter(year >= 2000) %>%
+  ggplot(aes(year,carbon_emissions)) +
+  geom_line() +
+  ylab("millions of metric tons of carbon") +
+  ggtitle("CO2 Emissions from 2000 to 2014") +
+  theme_economist()
+```
+In these last three plots we can see the continued rise of CO2 emissions.
+
+# 6. Greenhouse Gases
+
+looking at the data
+```{r}
+dim(greenhouse_gases)
+head(greenhouse_gases)
+tail(greenhouse_gases)
+summary(greenhouse_gases)
+str(greenhouse_gases)
+```
+
+## plot of greenhouse gases over the years
+```{r}
+greenhouse_gases %>% ggplot(aes(year, concentration)) +
+  geom_line(aes(colour = gas)) +
+  ylab("Parts Per Million") +
+  ggtitle("Greenhouse Gases in Atmosphere 20AD to 2000") +
+  theme_economist()
+```
+Here we can see unprecedented rise in CH4 also know as methane.
+
+```{r}
+greenhouse_gases %>% filter(year <= 1800) %>%
+  ggplot(aes(year, concentration)) +
+  geom_line(aes(colour = gas)) +
+  ylab("Parts Per Million") +
+  ggtitle("Greenhouse Gases in Atmosphere 20AD to 1800") +
+  theme_economist()
+```
+Up until the year 1800 the green house gases were stable.
+
+```{r}
+greenhouse_gases %>% filter(year >= 1800) %>%
+  ggplot(aes(year, concentration)) +
+  geom_line(aes(colour = gas)) +
+  ylab("Parts Per Million") +
+  ggtitle("Greenhouse Gases in Atmosphere 1800 to 2000") +
+  theme_economist()
+```
+But since then we have seen an unprecedented rise in greenhouse gases.
+
+# 7. Summary
+
+Climate Change is a difficult situation that we all face. We have seen through visually exploring the data that temperatures are rising, carbon concentration is rising, methane concentration is rising. The next step will be to find solutions that will allow us to level off greenhouse gases and maybe even reduce these concentrations back towards normal levels. If we don't, temperatures will continue to rise and that is an experiment I don't think we can afford to make.
