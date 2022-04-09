@@ -5,7 +5,6 @@ Climate change is an issue that we all face. It will be important to continue to
 The dataset used is from the dslabs libary in R. This libary was created by my Harvard professor for our class.
 
 This project consist of:
-* a Kaggle notebook
 * a R script
 * R Markdown 
 * PDF 
